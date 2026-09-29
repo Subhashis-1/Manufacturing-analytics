@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Scenario Runner Demo, Manufacturing Operations Analytics</title>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-7T6Q37M71H"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag() { window.dataLayer.push(arguments); }
+  gtag("js", new Date());
+  gtag("config", "G-7T6Q37M71H");
+</script>
+<style>
+  :root {
+    --ink:#22303C; --muted:#5B7180; --line:#DCE3E8; --bg:#F7F9FA;
+    --blue:#1565C0; --blue-soft:#E3F0FB; --grey:#9AA9B4;
+    --green:#2E7D32; --green-soft:#E6F4E7; --red:#C62828; --red-soft:#FBE9E9;
+    color-scheme:light;
+  }
+  * { box-sizing:border-box; }
+  body { font-family:-apple-system,"Segoe UI",Roboto,"Noto Sans TC",Helvetica,Arial,sans-serif;
+         color:var(--ink); background:var(--bg); margin:0; line-height:1.6;
+         -webkit-font-smoothing:antialiased; }
+  .wrap { max-width:880px; margin:0 auto; padding:0 1.2rem 4rem; }
+
+  .topbar { display:flex; justify-content:space-between; align-items:center; gap:.4rem;
+            max-width:880px; margin:0 auto; padding:1rem 1.2rem .2rem; }
+  .topbar .right { display:flex; gap:.4rem; }
+  .backlink { color:var(--muted); text-decoration:none; font-size:.85rem; font-weight:600; }
+  .backlink:hover { color:var(--blue); }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <a class="backlink" href="index.html"><span class="en">&larr; Back to project page</span></a>
+  <div class="right">
+
+
+  </div>
+</div>
+
+<div class="wrap">
+
+  <header class="hero">
+    <p class="kicker">Scenario Runner Demo</p>
+    <div class="en">
+      <h1>Pick a scenario, see the recorded result</h1>
+      <p class="lede">An interactive view of the same precomputed, fixed-seed what-if library the
+      project page cites. Nothing runs live here: every number below is traceable to a recorded
+      CRN-paired run on the synthetic line. The first four tabs map to the agent's four what-if
+      decision modules; the monitoring tab is a separate slow-drift detection demo, not a fifth
+      what-if decision module.</p>
+    </div>
+
+  </header>
+
+  <nav class="tabs" id="tabs">
+    <button class="tabbtn" data-tab="capacity"><span class="en">Capacity</span></button>
+    <button class="tabbtn" data-tab="maintenance"><span class="en">Maintenance</span></button>
+    <button class="tabbtn" data-tab="dispatch"><span class="en">Dispatching</span></button>
+    <button class="tabbtn" data-tab="yield"><span class="en">Yield</span></button>
+    <button class="tabbtn" data-tab="monitor"><span class="en">Monitoring</span></button>
+  </nav>
+
+  <!-- CAPACITY -->
+  <section class="finding tabpane" id="pane-capacity">
+    <h2><span class="en">Which station should receive the next tool?</span></h2>
+    <span class="prompt"><span class="en">Pick a station; the table compares whole-line impact and investment-stress net cost (illustrative rates, for ranking only) across all four options.</span></span>
+
+    <div class="choices" id="cap-choices">
+      <button class="choicebtn" data-id="LITHO">LITHO +1</button>
+      <button class="choicebtn" data-id="FURNACE">FURNACE +1</button>
+      <button class="choicebtn" data-id="DEPO">DEPO +1</button>
+      <button class="choicebtn" data-id="METRO">METRO +1</button>
+    </div>
+
+    <div class="table-wrap">
+      <table class="metric-table">
+        <thead>
+          <tr>
+            <th><span class="en">Station</span></th>
+            <th><span class="en">Added Lot-Processing Slots</span></th>
+            <th><span class="en">Avg Cycle-Time Reduction</span></th>
+            <th><span class="en">Investment-Stress Net Cost Change</span></th>
+          </tr>
+        </thead>
+        <tbody id="cap-rows">
+          <tr data-id="LITHO">
+            <td><strong>LITHO</strong></td>
+            <td class="barcell"><div class="barlabel"><span data-cap-field="slot_label"></span><span></span></div><div class="track"><div class="fill" style="width:25%"></div></div></td>
+            <td class="barcell"><div class="barlabel"><span data-cap-field="cycle_label"></span><span class="en">largest</span></div><div class="track"><div class="fill blue" style="width:100%"></div></div></td>
+            <td class="barcell"><div class="barlabel"><span class="cost-cost" data-cap-field="cost_label"></span><span></span></div><div class="track"><div class="fill red" style="width:100%"></div></div></td>
+          </tr>
+          <tr data-id="FURNACE">
+            <td><strong>FURNACE</strong></td>
+            <td class="barcell"><div class="barlabel"><span data-cap-field="slot_label"></span><span class="en">most slots</span></div><div class="track"><div class="fill green" style="width:100%"></div></div></td>
+            <td class="barcell"><div class="barlabel"><span data-cap-field="cycle_label"></span><span></span></div><div class="track"><div class="fill blue" style="width:28%"></div></div></td>
+            <td class="barcell"><div class="barlabel"><span class="cost-save" data-cap-field="cost_label"></span><span></span></div><div class="track"><div class="fill green" style="width:22%"></div></div></td>
+          </tr>
+          <tr data-id="DEPO">
+            <td><strong>DEPO</strong></td>
+            <td class="barcell"><div class="barlabel"><span data-cap-field="slot_label"></span><span></span></div><div class="track"><div class="fill" style="width:25%"></div></div></td>
+            <td class="barcell"><div class="barlabel"><span data-cap-field="cycle_label"></span><span></span></div><div class="track"><div class="fill blue" style="width:10%"></div></div></td>
+            <td class="barcell"><div class="barlabel"><span class="cost-cost" data-cap-field="cost_label"></span><span></span></div><div class="track"><div class="fill red" style="width:21%"></div></div></td>
+          </tr>
+          <tr data-id="METRO">
+            <td><strong>METRO</strong></td>
+            <td class="barcell"><div class="barlabel"><span data-cap-field="slot_label"></span><span></span></div><div class="track"><div class="fill tiny" style="width:25%"></div></div></td>
+            <td class="barcell"><div class="barlabel"><span data-cap-field="cycle_label"></span><span></span></div><div class="track"><div class="fill blue tiny" style="width:2%"></div></div></td>
+            <td class="barcell"><div class="barlabel"><span class="cost-cost" data-cap-field="cost_label"></span><span></span></div><div class="track"><div class="fill red" style="width:17%"></div></div></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="memo" id="cap-memo"></div>
+    <div class="record" id="cap-record"></div>
+  </section>
+
+  <!-- MAINTENANCE -->
+  <section class="finding tabpane" id="pane-maintenance">
+    <h2><span class="en">Maintain now or wait?</span></h2>
+    <span class="prompt"><span class="en">Pick a PM timing and compare its total cost against the alternatives.</span></span>
+    <p class="scope-note"><span class="en">The recorded library covers PM timing on LITHO, the engineered bottleneck. The underlying engine accepts a station parameter, but only the LITHO runs are published.</span></p>
+
+    <div class="choices" id="mnt-choices">
+      <button class="choicebtn" data-id="immediate"><span class="en">Immediate PM</span></button>
+      <button class="choicebtn" data-id="mid"><span class="en">Mid PM</span></button>
+      <button class="choicebtn" data-id="late"><span class="en">Late PM</span></button>
+    </div>
+
+    <div class="engine-bars" id="mnt-bars">
+      <div class="engine-bar" data-id="immediate">
+        <span><span class="en">Immediate PM</span></span>
+        <div class="track"><div class="fill green" style="width:38%"></div></div>
+        <span class="value" data-mnt-field="value"></span>
+      </div>
+      <div class="engine-bar" data-id="mid">
+        <span><span class="en">Mid PM</span></span>
+        <div class="track"><div class="fill" style="width:53%"></div></div>
+        <span class="value" data-mnt-field="value"></span>
+      </div>
+      <div class="engine-bar" data-id="late">
+        <span><span class="en">Late PM</span></span>
+        <div class="track"><div class="fill red" style="width:100%"></div></div>
+        <span class="value" data-mnt-field="value"></span>
+      </div>
+    </div>
+
+    <div class="memo" id="mnt-memo"></div>
+    <div class="record" id="mnt-record"></div>
+  </section>
+
+  <!-- DISPATCH -->
+  <section class="finding tabpane" id="pane-dispatch">
+    <h2><span class="en">Which queue rule fits the objective?</span></h2>
+    <span class="prompt"><span class="en">Pick an operating objective; the winning policy is read from the same policy comparison runs.</span></span>
+
+    <div class="choices" id="dsp-choices">
+      <button class="choicebtn" data-id="ct"><span class="en">Cycle time</span></button>
+      <button class="choicebtn" data-id="ontime"><span class="en">On-time delivery</span></button>
+      <button class="choicebtn" data-id="yieldrisk"><span class="en">Yield risk</span></button>
+      <button class="choicebtn" data-id="cost"><span class="en">Total cost</span></button>
+    </div>
+
+    <div class="engine-winners" id="dsp-winners">
+      <div class="engine-winner" data-id="ct"><span><span class="en">Cycle time</span></span><strong data-dsp-field="winner"></strong></div>
+      <div class="engine-winner" data-id="ontime"><span><span class="en">On-time</span></span><strong data-dsp-field="winner"></strong></div>
+      <div class="engine-winner" data-id="yieldrisk"><span><span class="en">Yield risk</span></span><strong data-dsp-field="winner"></strong></div>
+      <div class="engine-winner" data-id="cost"><span><span class="en">Total cost</span></span><strong data-dsp-field="winner"></strong></div>
+    </div>
+
+    <div class="memo" id="dsp-memo"></div>
+    <div class="record" id="dsp-record"></div>
+  </section>
+
+  <!-- YIELD -->
+  <section class="finding tabpane" id="pane-yield">
+    <h2><span class="en">Does faster flow increase quality risk?</span></h2>
+    <span class="prompt"><span class="en">Flip between baseline and the LITHO +1 scenario; speed and yield risk share one view.</span></span>
+    <p class="scope-note"><span class="en">The recorded library covers the LITHO +1 scenario: LITHO is the engineered bottleneck, so the speed-yield tension is sharpest there.</span></p>
+
+    <div class="choices" id="yld-choices">
+      <button class="choicebtn" data-id="baseline">Baseline</button>
+      <button class="choicebtn" data-id="litho1">LITHO +1 tool</button>
+    </div>
+
+    <div class="engine-pair">
+      <div>
+        <strong id="yld-ct"></strong>
+        <span><span class="en">avg cycle-time change vs baseline</span></span>
+      </div>
+      <div>
+        <strong id="yld-vio"></strong>
+        <span><span class="en">post-litho violation-rate change vs baseline</span></span>
+      </div>
+    </div>
+
+    <div class="memo" id="yld-memo"></div>
+    <div class="record" id="yld-record"></div>
+  </section>
+
+  <!-- MONITORING -->
+  <section class="finding tabpane" id="pane-monitor">
+    <h2><span class="en">Which monitor catches slow drift in time?</span></h2>
+    <span class="prompt"><span class="en">Pick a monitoring rule and see when it alerts in the 160-day labeled backtest.</span></span>
+
+    <div class="choices" id="mon-choices">
+      <button class="choicebtn" data-id="output"><span class="en">Output-only monitor</span></button>
+      <button class="choicebtn" data-id="ewma"><span class="en">EWMA drift monitor</span></button>
+    </div>
+
+    <div class="table-wrap">
+      <table class="metric-table">
+        <thead class="en"><tr><th>Monitoring approach</th><th>Signal watched</th><th>Alert logic</th><th>Result</th></tr></thead>
+
+        <tbody id="mon-rows">
+          <tr data-id="output">
+            <td><strong class="en">Output-only monitor</strong></td>
+            <td>Daily output / throughput</td>
+            <td><span class="en">Alert only when output drops below the clean baseline lower control limit.</span></td>
+            <td><span class="en" data-mon-result="en"></span></td>
+          </tr>
+          <tr data-id="ewma">
+            <td><strong class="en">EWMA drift monitor</strong></td>
+            <td><span class="en">Daily median lot cycle time</span></td>
+            <td><span class="en">Alert when small persistent cycle-time drift accumulates.</span></td>
+            <td><span class="en" data-mon-result="en"></span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="inline-chart">
+      <img src="assets/finding03_output_cycle_time.png"
+           alt="Degradation stays hidden in daily output but appears in daily median cycle time">
+    </div>
+    <p class="caption en"><strong>Observation:</strong> daily output remains noisy but ordinary, while
+    daily median cycle time separates from the clean twin after degradation starts.</p>
+
+
+    <div class="memo" id="mon-memo"></div>
+    <div class="record" id="mon-record"></div>
+  </section>
+
+  <div class="links">
+    <a class="btn ghost" href="index.html">
+      <span class="en">&larr; Back to project page</span></a>
+  </div>
+
+  <p class="note en">Scope: this page is a bounded demo over a precomputed scenario library;
+  it does not run new simulations or accept free-form parameters. The line is synthetic with fixed
+  seeds; cost figures are illustrative assumptions used for ranking, not real-fab prices or savings
+  forecasts. The memo preview uses a fixed template, not a live language model.</p>
+
+
+</div>
+
+<script>
+
+  // Keep dynamic labels in English, matching the rest of the page.
+  function bi(en){ return en; }
+
+  // Structured analysis record: rows = [[label html, value html], ...].
+  // Values are kept as English, code-style fields (repo data language).
+  function renderRecord(el, rows){
+    var html = '<p class="rec-title">' + bi('Analysis record') + '</p>';
+    rows.forEach(function(r){
+      html += '<div class="row"><span class="k">' + r[0] + '</span><span class="v">' + r[1] + '</span></div>';
+    });
+    el.innerHTML = html;
+  }
+
+  function renderMemo(el, body){
+    el.innerHTML = '<p class="memo-title">' + bi('Decision memo preview') + '</p>'
+      + '<p>' + body + '</p>'
+      + '<p class="memo-note">' + bi(
+          'Fixed template filled from the analysis record below; no live LLM, no numbers outside the record.') + '</p>';
+  }
+
+  var L = {
+    scenario: 'Scenario',
+    engine: bi('Engine'),
+    run: 'Run',
+    seeds: 'Seeds',
+    assumptions: bi('Assumptions'),
+    kpi: bi('KPI result')
+  };
+
+  // Generic single-select group: buttons + highlighted result elements share data-id.
+  function wireChoices(groupEl, onSelect){
+    var btns = groupEl.querySelectorAll('.choicebtn');
+    btns.forEach(function(b){
+      b.addEventListener('click', function(){
+        btns.forEach(function(x){ x.setAttribute('aria-pressed', x === b); });
+        onSelect(b.dataset.id);
+      });
+    });
+    return function(id){
+      btns.forEach(function(x){ x.setAttribute('aria-pressed', x.dataset.id === id); });
+      onSelect(id);
+    };
+  }
+
+  function highlight(containerSel, itemSel, id){
+    document.querySelectorAll(containerSel + ' ' + itemSel).forEach(function(el){
+      el.classList.toggle('sel', el.dataset.id === id);
+    });
+  }
+
+  var DATA = null;
+
+  function recordRows(section){
+    var r = DATA[section].records;
+    return [
+      [L.engine, r.engine],
+      [L.run, r.run],
+      [L.seeds, r.seeds],
+      [L.assumptions, r.assumptions]
+    ];
+  }
+
+  function applyStaticData(){
+    Object.keys(DATA.capacity.rows).forEach(function(id){
+      var row = document.querySelector('#cap-rows tr[data-id="' + id + '"]');
+      Object.keys(DATA.capacity.rows[id]).forEach(function(field){
+        row.querySelector('[data-cap-field="' + field + '"]').textContent =
+          DATA.capacity.rows[id][field];
+      });
+    });
+    Object.keys(DATA.maintenance.scenarios).forEach(function(id){
+      document.querySelector('#mnt-bars [data-id="' + id + '"] [data-mnt-field="value"]')
+        .textContent = DATA.maintenance.scenarios[id].value;
+    });
+    Object.keys(DATA.dispatch.winners).forEach(function(id){
+      document.querySelector('#dsp-winners [data-id="' + id + '"] [data-dsp-field="winner"]')
+        .textContent = DATA.dispatch.winners[id];
+    });
+    Object.keys(DATA.monitoring.rows).forEach(function(id){
+      var row = document.querySelector('#mon-rows tr[data-id="' + id + '"]');
+      row.querySelector('[data-mon-result="en"]').textContent = DATA.monitoring.rows[id].result_en;
+
+    });
+  }
+
+  /* ---------- Capacity ---------- */
+  var CAP = {
+    LITHO: {
+      memo: bi('Scenario add_tool_LITHO ranks first on cycle time: a 2.46 h reduction (95% CI 2.13-2.79 h), against 0.70 h for FURNACE, 0.26 h for DEPO and 0.05 h for METRO. Under the illustrative investment-stress rates it is also the most expensive option (+$8.0k), while FURNACE is the only net saver (-$1.7k). If the priority is shortening cycle time, LITHO is the pick and the cost premium is the price; if the priority is short-term cost, FURNACE is the defensible choice.')
+    },
+    FURNACE: {
+      memo: bi('Scenario add_tool_FURNACE adds the most lot-processing slots (+4) but cuts cycle time by only 0.70 h, against 2.46 h for LITHO: the batch tool sits far from the constraint. Under the illustrative stress rates it is the only net-saving option (-$1.7k), while LITHO costs +$8.0k. If the priority is short-term cost, FURNACE wins; if the priority is cycle time, the slot count is a distraction and LITHO is the answer.')
+    },
+    DEPO: {
+      memo: bi('Scenario add_tool_DEPO reduces cycle time by 0.26 h at a net cost of +$1.7k: behind LITHO (2.46 h) on speed and behind FURNACE (-$1.7k) on cost. It wins under neither objective, so in this scenario set the investment goes elsewhere regardless of priority.')
+    },
+    METRO: {
+      memo: bi('Scenario add_tool_METRO changes cycle time by only 0.05 h at a net cost of +$1.4k, last on both rankings: the station is far from the constraint. Whichever objective leads, the comparison points to LITHO (speed) or FURNACE (cost) instead.')
+    }
+  };
+  var setCap = wireChoices(document.getElementById('cap-choices'), function(id){
+    var d = DATA.capacity.scenarios[id];
+    var copy = CAP[id];
+    highlight('#cap-rows', 'tr', id);
+    renderMemo(document.getElementById('cap-memo'), copy.memo);
+    renderRecord(document.getElementById('cap-record'),
+      [[L.scenario, '<code>add_tool_' + id + '</code>']].concat(recordRows('capacity'), [[L.kpi, d.kpi]]));
+  });
+
+  /* ---------- Maintenance ---------- */
+  var MNT = {
+    immediate: {
+      memo: bi('Immediate PM totals $1.75M against $2.45M for mid and $4.59M for late: acting at the alert ranks first under the illustrative rates. Every step of delay adds accumulated congestion cost, +40% by mid and 2.6x by late, so unless capacity constraints force a deferral, the alert is worth acting on now.')
+    },
+    mid: {
+      memo: bi('Mid PM totals $2.45M: 40% above immediate ($1.75M) but $2.14M below late ($4.59M). If PM must be deferred, for example through a capacity crunch, mid is the damage-control option; if nothing forces the wait, immediate still ranks first.')
+    },
+    late: {
+      memo: bi('Late PM totals $4.59M, 2.6 times the immediate option ($1.75M) and well above mid ($2.45M). Once a cost is attached to delay, there is no objective in this comparison under which waiting to the end wins: the delay penalty dominates whatever the deferral saved.')
+    }
+  };
+  var setMnt = wireChoices(document.getElementById('mnt-choices'), function(id){
+    var d = DATA.maintenance.scenarios[id];
+    var copy = MNT[id];
+    highlight('#mnt-bars', '.engine-bar', id);
+    renderMemo(document.getElementById('mnt-memo'), copy.memo);
+    renderRecord(document.getElementById('mnt-record'),
+      [[L.scenario, '<code>pm_timing_' + id + '</code>']].concat(recordRows('maintenance'), [[L.kpi, d.kpi]]));
+  });
+
+  /* ---------- Dispatching ---------- */
+  var DSP = {
+    ct: {
+      memo: bi('For an average cycle-time objective EDD is the winning policy; it also wins on-time delivery. The winner flips to release control once the objective becomes yield risk or total cost, so the rule to deploy depends on which objective the line is being run for, not on a single all-purpose ranking.')
+    },
+    ontime: {
+      memo: bi('For an on-time-delivery objective EDD wins, consistent with its due-date-driven queue ordering, and it also holds the cycle-time objective. Yield risk and total cost point to release control instead, so the on-time pick does not transfer automatically to cost-led operations.')
+    },
+    yieldrisk: {
+      memo: bi('For a yield-risk objective release control wins: holding lots at release keeps fewer in flight and cuts queue-time exposure, at some flow cost. This is where the cycle-time winner (EDD) stops being the answer; if quality exposure leads, control the release, if speed leads, switch back to EDD.')
+    },
+    cost: {
+      memo: bi('For a total-cost objective under the illustrative rates, release control wins once yield and congestion costs are combined, mirroring the yield-risk result; EDD keeps the speed objectives. No single dispatch rule dominates all four objectives, which is the point of running the comparison per objective.')
+    }
+  };
+  var setDsp = wireChoices(document.getElementById('dsp-choices'), function(id){
+    var d = DATA.dispatch.scenarios[id];
+    var copy = DSP[id];
+    highlight('#dsp-winners', '.engine-winner', id);
+    renderMemo(document.getElementById('dsp-memo'), copy.memo);
+    renderRecord(document.getElementById('dsp-record'),
+      [[L.scenario, '<code>dispatch_objective_' + id + '</code>']].concat(recordRows('dispatch'), [[L.kpi, d.kpi]]));
+  });
+
+  /* ---------- Yield ---------- */
+  var YLD = {
+    baseline: {
+      memo: bi('Baseline reference: both KPIs are defined as deltas against this run, so they read zero here. Flip to LITHO +1 to see the recorded trade-off: the speed gain and the quality risk move together in the paired runs.')
+    },
+    litho1: {
+      memo: bi('Adding one LITHO tool cuts average cycle time by 2.87 h but raises the post-litho violation rate by 0.038, and both numbers come from the same paired runs. If the capacity decision is made on cycle time alone, the quality axis stays invisible; if post-litho violations carry cost, the option ranking can change once both axes are combined, which is why speed and yield risk belong in one decision view.')
+    }
+  };
+  var setYld = wireChoices(document.getElementById('yld-choices'), function(id){
+    var d = DATA.yield.scenarios[id];
+    var copy = YLD[id];
+    document.getElementById('yld-ct').textContent = d.ct;
+    document.getElementById('yld-vio').textContent = d.vio;
+    renderMemo(document.getElementById('yld-memo'), copy.memo);
+    renderRecord(document.getElementById('yld-record'),
+      [[L.scenario, '<code>yield_' + (id === 'litho1' ? 'litho_plus1' : 'baseline') + '</code>']]
+        .concat(recordRows('yield'), [[L.kpi, d.kpi]]));
+  });
+
+  /* ---------- Monitoring ---------- */
+  var MON = {
+    output: {
+      memo: bi('The output-only monitor never alerts within the 160-day horizon even though degradation starts on day 30, while the EWMA rule on the same backtest alerts on day 84. Watching output alone reports the problem only after the congestion cost is already sunk; if early action matters, the drift signal is the one to watch.')
+    },
+    ewma: {
+      memo: bi('The EWMA drift monitor alerts on day 84 against a day-30 onset, while the output-only rule stays silent for all 160 days. In this experiment the 76 remaining days are where early action can still avoid the extra degradation cost; paired with the PM-timing comparison, that lead time is what turns detection into decision value.')
+    }
+  };
+  var setMon = wireChoices(document.getElementById('mon-choices'), function(id){
+    var d = DATA.monitoring.scenarios[id];
+    var copy = MON[id];
+    highlight('#mon-rows', 'tr', id);
+    renderMemo(document.getElementById('mon-memo'), copy.memo);
+    renderRecord(document.getElementById('mon-record'),
+      [[L.scenario, '<code>slow_drift_backtest_' + id + '</code>']].concat(recordRows('monitoring'), [[L.kpi, d.kpi]]));
+  });
+
+  /* ---------- Tabs ---------- */
+  var tabBtns = document.querySelectorAll('#tabs .tabbtn');
+  function setTab(id){
+    tabBtns.forEach(function(b){ b.setAttribute('aria-pressed', b.dataset.tab === id); });
+    document.querySelectorAll('.tabpane').forEach(function(p){
+      p.classList.toggle('active', p.id === 'pane-' + id);
+    });
+  }
+  tabBtns.forEach(function(b){
+    b.addEventListener('click', function(){ setTab(b.dataset.tab); });
+  });
+
+  function initialize(data){
+    DATA = data;
+    applyStaticData();
+    setTab('capacity');
+    setCap('LITHO');
+    setMnt('immediate');
+    setDsp('ct');
+    setYld('litho1');
+    setMon('ewma');
+  }
+
+  // Same-origin fetch works on GitHub Pages and local docs-static servers;
+  // opening this file directly with file:// will not load the JSON asset.
+  fetch('assets/scenario_runner_data.json')
+    .then(function(response){
+      if (!response.ok) throw new Error('scenario data fetch failed');
+      return response.json();
+    })
+    .then(initialize)
+    .catch(function(error){
+      console.error(error);
+      document.body.insertAdjacentHTML(
+        'beforeend',
+        '<p style="padding:1rem;color:#B00020">Scenario data failed to load. Use a local static server.</p>'
+      );
+    });
+</script>
+</body>
+</html>
